@@ -1,6 +1,24 @@
 # MinHash
 
-A simple but effective implementation of Minhash + Banded LSH, suitable for finding the set of all similar strings in large datasets in O(N) time.
+A simple but effective pure python implementation of Minhash + Banded LSH. Built for for finding the set of all similar strings in a large corpus in O(N) time. 
+
+Designed for "fuzzy matching" strings to account for misspellings, it could also be used for finding similar documents from a web crawl by splitting strings along word boundaries rather than character boundaries.
+
+Running Test:
+```bash
+>>> python MinHash.py
+```
+
+Usage:
+```python
+from MinHash import get_similar_docs
+docs = ['aaaaab', 'aaaaac', 'xyz']
+similar_docs = get_similar_docs(docs)
+print similar_docs
+> set([('aaaaab', 'aaaaac')])
+```
+
+Note that you may need to adjust the default parameters to best match your application.
 
 ## References
 [Awesome Chapter about MinHash + LSH this algorithm comes from](http://infolab.stanford.edu/~ullman/mmds/ch3.pdf) 
