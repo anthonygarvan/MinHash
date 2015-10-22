@@ -3,18 +3,16 @@ import string
 import sys
 import itertools
 
-def generate_random_docs(n_docs, max_doc_length):
-	docs = []
-	seed(5)
+def generate_random_docs(n_docs, max_doc_length, n_similar_docs):
 	for i in range(n_docs):
-		docs.append(''.join(choice('aaeioutgrb ') for _ in range(randint(int(max_doc_length*.75), max_doc_length))))
-
-	for i in range(10):
-		permuted_doc = list(choice(docs))
-		permuted_doc[randint(0,len(permuted_doc))] = choice('1234567890')
-		docs.append(''.join(permuted_doc))
-
-	return docs
+		if n_similar_docs > 0 and i % 10 == 0 and i > 0:
+			permuted_doc = list(lastDoc)
+			permuted_doc[randint(0,len(permuted_doc))] = choice('1234567890')
+			n_similar_docs -= 1
+			yield ''.join(permuted_doc)
+		else:
+			lastDoc = ''.join(choice('aaeioutgrb ') for _ in range(randint(int(max_doc_length*.75), max_doc_length)))
+			yield lastDoc
 
 def generate_shingles(doc, shingle_size):
 	shingles = set([])
@@ -22,14 +20,12 @@ def generate_shingles(doc, shingle_size):
 		shingles.add(doc[i:i+shingle_size])
 	return shingles
 
-def get_minhash(shingles, n_hashes):
-	seed(0)
+def get_minhash(shingles, n_hashes, random_strings):
 	minhash_row = []
 	for i in range(n_hashes):
-		randomStr = str(random())
 		minhash = sys.maxint
 		for shingle in shingles:
-			hash_candidate = abs(hash(shingle + randomStr))
+			hash_candidate = abs(hash(shingle + random_strings[i]))
 			if hash_candidate < minhash:
 				minhash = hash_candidate
 		minhash_row.append(minhash)
@@ -47,9 +43,10 @@ def get_band_hashes(minhash_row, band_size):
 
 def get_similar_docs(docs, n_hashes=400, band_size=7, shingle_size=3):
 	hash_bands = {}
+	random_strings = [str(random()) for _ in range(n_hashes)]
 	for doc in docs:
 		shingles = generate_shingles(doc, shingle_size)
-		minhash_row = get_minhash(shingles, n_hashes)
+		minhash_row = get_minhash(shingles, n_hashes, random_strings)
 		band_hashes = get_band_hashes(minhash_row, band_size)
 		
 		for i in range(len(band_hashes)):
@@ -74,9 +71,10 @@ if __name__ == '__main__':
 	band_size = 7
 	shingle_size = 3
 	n_docs = 1000
-	max_doc_length = 20
-
-	docs = generate_random_docs(n_docs, max_doc_length)
+	max_doc_length = 40
+	n_similar_docs = 10
+	seed(42)
+	docs = generate_random_docs(n_docs, max_doc_length, n_similar_docs)
 
 	similar_docs = get_similar_docs(docs, n_hashes, band_size, shingle_size)
 
@@ -85,3 +83,8 @@ if __name__ == '__main__':
 	similarity = (1/r)**(1/float(band_size))
 	print "similarity: %f" % similarity
 	print "# Similar Pairs: %d" % len(similar_docs)
+
+	if len(similar_docs) == n_similar_docs:
+		print "Test Passed: All similar pairs found."
+	else:
+		print "Test Failed."
