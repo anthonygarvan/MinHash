@@ -41,21 +41,24 @@ def get_band_hashes(minhash_row, band_size):
 		band_hash += hash(minhash_row[i])		
 	return band_hashes
 
-def get_similar_docs(docs, n_hashes=400, band_size=7, shingle_size=3):
+def get_similar_docs(docs, n_hashes=400, band_size=7, shingle_size=3, collectIndexes=True):
 	hash_bands = {}
 	random_strings = [str(random()) for _ in range(n_hashes)]
+	docNum = 0
 	for doc in docs:
 		shingles = generate_shingles(doc, shingle_size)
 		minhash_row = get_minhash(shingles, n_hashes, random_strings)
 		band_hashes = get_band_hashes(minhash_row, band_size)
 		
+		docMember = docNum if collectIndexes else doc
 		for i in range(len(band_hashes)):
 			if i not in hash_bands:
 				hash_bands[i] = {}
 			if band_hashes[i] not in hash_bands[i]:
-				hash_bands[i][band_hashes[i]] = [doc]
+				hash_bands[i][band_hashes[i]] = [docMember]
 			else:
-				hash_bands[i][band_hashes[i]].append(doc)
+				hash_bands[i][band_hashes[i]].append(docMember)
+		docNum += 1
 
 	similar_docs = set()
 	for i in hash_bands:
@@ -76,7 +79,7 @@ if __name__ == '__main__':
 	seed(42)
 	docs = generate_random_docs(n_docs, max_doc_length, n_similar_docs)
 
-	similar_docs = get_similar_docs(docs, n_hashes, band_size, shingle_size)
+	similar_docs = get_similar_docs(docs, n_hashes, band_size, shingle_size, collectIndexes=False)
 
 	print similar_docs
 	r = float(n_hashes/band_size)
