@@ -23,5 +23,5 @@ print similar_docs
 Note that you may need to adjust the default parameters to best match your application.
 
 ## References
-[Awesome Chapter about MinHash + LSH this algorithm comes from](http://infolab.stanford.edu/~ullman/mmds/ch3.pdf) 
-[Awesome blog post about MinHash from a deveopers perspective](http://matthewcasperson.blogspot.com/2013/11/minhash-for-dummies.html)
+- [Awesome Chapter about MinHash + LSH this algorithm comes from](http://infolab.stanford.edu/~ullman/mmds/ch3.pdf) 
+- [Awesome blog post about MinHash from a developers perspective](http://matthewcasperson.blogspot.com/2013/11/minhash-for-dummies.html)
